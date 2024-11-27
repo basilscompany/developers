@@ -1,0 +1,254 @@
+{
+  "kind": "Pod",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "opensearch-cluster-dashboards-cd4b867f4-wpgjx",
+    "generateName": "opensearch-cluster-dashboards-cd4b867f4-",
+    "namespace": "test1",
+    "uid": "15d8afc0-a4fc-45d4-a458-73300ccc6aeb",
+    "resourceVersion": "19012399",
+    "creationTimestamp": "2024-11-18T08:33:26Z",
+    "labels": {
+      "opensearch.cluster.dashboards": "opensearch-cluster",
+      "pod-template-hash": "cd4b867f4"
+    },
+    "annotations": {
+      "checksum/dashboards.yml": "908348efb36526552fe58d6839d2dda3adc52acd"
+    },
+    "ownerReferences": [
+      {
+        "apiVersion": "apps/v1",
+        "kind": "ReplicaSet",
+        "name": "opensearch-cluster-dashboards-cd4b867f4",
+        "uid": "8b314da5-3546-42d1-a22a-ee216e981c03",
+        "controller": true,
+        "blockOwnerDeletion": true
+      }
+    ]
+  },
+  "spec": {
+    "volumes": [
+      {
+        "name": "dashboards-config",
+        "configMap": {
+          "name": "opensearch-cluster-dashboards-config",
+          "defaultMode": 420
+        }
+      },
+      {
+        "name": "kube-api-access-kxrf9",
+        "projected": {
+          "sources": [
+            {
+              "serviceAccountToken": {
+                "expirationSeconds": 3607,
+                "path": "token"
+              }
+            },
+            {
+              "configMap": {
+                "name": "kube-root-ca.crt",
+                "items": [
+                  {
+                    "key": "ca.crt",
+                    "path": "ca.crt"
+                  }
+                ]
+              }
+            },
+            {
+              "downwardAPI": {
+                "items": [
+                  {
+                    "path": "namespace",
+                    "fieldRef": {
+                      "apiVersion": "v1",
+                      "fieldPath": "metadata.namespace"
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "defaultMode": 420
+        }
+      }
+    ],
+    "containers": [
+      {
+        "name": "dashboards",
+        "image": "docker.io/opensearchproject/opensearch-dashboards:2.3.0",
+        "command": [
+          "/bin/bash",
+          "-c",
+          "./opensearch-dashboards-docker-entrypoint.sh"
+        ],
+        "ports": [
+          {
+            "name": "http",
+            "containerPort": 5601,
+            "protocol": "TCP"
+          }
+        ],
+        "env": [
+          {
+            "name": "OPENSEARCH_HOSTS",
+            "value": "https://my-cluster.outpost-itops.svc.cluster.local:9200"
+          },
+          {
+            "name": "SERVER_HOST",
+            "value": "0.0.0.0"
+          },
+          {
+            "name": "OPENSEARCH_USERNAME",
+            "value": "admin"
+          },
+          {
+            "name": "OPENSEARCH_PASSWORD",
+            "value": "admin"
+          }
+        ],
+        "resources": {
+          "limits": {
+            "cpu": "500m",
+            "memory": "1Gi"
+          },
+          "requests": {
+            "cpu": "500m",
+            "memory": "1Gi"
+          }
+        },
+        "volumeMounts": [
+          {
+            "name": "dashboards-config",
+            "mountPath": "/usr/share/opensearch-dashboards/config/opensearch_dashboards.yml",
+            "subPath": "opensearch_dashboards.yml"
+          },
+          {
+            "name": "kube-api-access-kxrf9",
+            "readOnly": true,
+            "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+          }
+        ],
+        "livenessProbe": {
+          "httpGet": {
+            "path": "/api/reporting/stats",
+            "port": 5601,
+            "scheme": "HTTP"
+          },
+          "initialDelaySeconds": 10,
+          "timeoutSeconds": 5,
+          "periodSeconds": 20,
+          "successThreshold": 1,
+          "failureThreshold": 10
+        },
+        "startupProbe": {
+          "httpGet": {
+            "path": "/api/reporting/stats",
+            "port": 5601,
+            "scheme": "HTTP"
+          },
+          "initialDelaySeconds": 10,
+          "timeoutSeconds": 5,
+          "periodSeconds": 20,
+          "successThreshold": 1,
+          "failureThreshold": 10
+        },
+        "terminationMessagePath": "/dev/termination-log",
+        "terminationMessagePolicy": "File",
+        "imagePullPolicy": "IfNotPresent"
+      }
+    ],
+    "restartPolicy": "Always",
+    "terminationGracePeriodSeconds": 30,
+    "dnsPolicy": "ClusterFirst",
+    "serviceAccountName": "default",
+    "serviceAccount": "default",
+    "nodeName": "ip-10-255-40-216.us-west-2.compute.internal",
+    "securityContext": {},
+    "schedulerName": "default-scheduler",
+    "tolerations": [
+      {
+        "key": "node.kubernetes.io/not-ready",
+        "operator": "Exists",
+        "effect": "NoExecute",
+        "tolerationSeconds": 300
+      },
+      {
+        "key": "node.kubernetes.io/unreachable",
+        "operator": "Exists",
+        "effect": "NoExecute",
+        "tolerationSeconds": 300
+      }
+    ],
+    "priority": 0,
+    "enableServiceLinks": true,
+    "preemptionPolicy": "PreemptLowerPriority"
+  },
+  "status": {
+    "phase": "Running",
+    "conditions": [
+      {
+        "type": "PodReadyToStartContainers",
+        "status": "True",
+        "lastProbeTime": null,
+        "lastTransitionTime": "2024-11-18T08:33:54Z"
+      },
+      {
+        "type": "Initialized",
+        "status": "True",
+        "lastProbeTime": null,
+        "lastTransitionTime": "2024-11-18T08:33:26Z"
+      },
+      {
+        "type": "Ready",
+        "status": "True",
+        "lastProbeTime": null,
+        "lastTransitionTime": "2024-11-18T08:36:26Z"
+      },
+      {
+        "type": "ContainersReady",
+        "status": "True",
+        "lastProbeTime": null,
+        "lastTransitionTime": "2024-11-18T08:36:26Z"
+      },
+      {
+        "type": "PodScheduled",
+        "status": "True",
+        "lastProbeTime": null,
+        "lastTransitionTime": "2024-11-18T08:33:26Z"
+      }
+    ],
+    "hostIP": "10.255.40.216",
+    "hostIPs": [
+      {
+        "ip": "10.255.40.216"
+      }
+    ],
+    "podIP": "10.255.43.123",
+    "podIPs": [
+      {
+        "ip": "10.255.43.123"
+      }
+    ],
+    "startTime": "2024-11-18T08:33:26Z",
+    "containerStatuses": [
+      {
+        "name": "dashboards",
+        "state": {
+          "running": {
+            "startedAt": "2024-11-18T08:33:53Z"
+          }
+        },
+        "lastState": {},
+        "ready": true,
+        "restartCount": 0,
+        "image": "docker.io/opensearchproject/opensearch-dashboards:2.3.0",
+        "imageID": "docker.io/opensearchproject/opensearch-dashboards@sha256:ab0f66a48599af9d0a6d54d6f5f62362e434291e9875bc729e6d643570d58d3c",
+        "containerID": "containerd://980941365b56d47cc56b8671485826f75bd2306d297a5c6f800912987f8acd2c",
+        "started": true
+      }
+    ],
+    "qosClass": "Guaranteed"
+  }
+}
